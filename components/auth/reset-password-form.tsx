@@ -2,18 +2,30 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { signInWithEmail, type AuthActionState } from "@/lib/appwrite/auth";
+import {
+  completePasswordRecovery,
+  type RecoveryActionState,
+} from "@/lib/appwrite/recovery";
 
-const initialState: AuthActionState = {};
+const initialState: RecoveryActionState = {};
 
-export function LoginForm() {
+export function ResetPasswordForm({
+  userId,
+  secret,
+}: {
+  userId: string;
+  secret: string;
+}) {
   const [state, formAction, pending] = useActionState(
-    signInWithEmail,
+    completePasswordRecovery,
     initialState,
   );
 
   return (
     <form action={formAction} className="space-y-5">
+      <input type="hidden" name="userId" value={userId} />
+      <input type="hidden" name="secret" value={secret} />
+
       {state?.error ? (
         <p
           role="alert"
@@ -24,28 +36,29 @@ export function LoginForm() {
       ) : null}
 
       <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm text-muted">
-          Email
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-foreground outline-none ring-accent focus:ring-2"
-        />
-      </div>
-
-      <div className="space-y-2">
         <label htmlFor="password" className="block text-sm text-muted">
-          Password
+          New password
         </label>
         <input
           id="password"
           name="password"
           type="password"
-          autoComplete="current-password"
+          autoComplete="new-password"
+          required
+          minLength={8}
+          className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-foreground outline-none ring-accent focus:ring-2"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="confirm" className="block text-sm text-muted">
+          Confirm password
+        </label>
+        <input
+          id="confirm"
+          name="confirm"
+          type="password"
+          autoComplete="new-password"
           required
           minLength={8}
           className="w-full rounded-md border border-border bg-card px-3 py-2.5 text-foreground outline-none ring-accent focus:ring-2"
@@ -57,19 +70,12 @@ export function LoginForm() {
         disabled={pending}
         className="inline-flex w-full items-center justify-center rounded-md bg-foreground px-5 py-2.5 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-60"
       >
-        {pending ? "Signing in…" : "Sign in"}
+        {pending ? "Updating…" : "Update password"}
       </button>
 
       <p className="font-mono text-sm text-muted">
         <Link href="/forgot-password" className="text-accent hover:underline">
-          Forgot password?
-        </Link>
-      </p>
-
-      <p className="font-mono text-sm text-muted">
-        No account?{" "}
-        <Link href="/register" className="text-accent hover:underline">
-          Register
+          Request a new link
         </Link>
       </p>
     </form>
