@@ -34,9 +34,9 @@ export function ReportListingButton({
 
   if (!isLoggedIn) {
     return (
-      <Button variant="ghost" size="sm" asChild className="mt-2 px-0 text-muted-foreground">
+      <Button variant="ghost" asChild className="text-muted-foreground">
         <Link href={loginHref}>
-          <Flag className="mr-1.5 size-3.5" aria-hidden />
+          <Flag className="mr-1.5 size-4" aria-hidden />
           Sign in to report listing
         </Link>
       </Button>
@@ -74,10 +74,9 @@ export function ReportListingButton({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          className="mt-2 px-0 text-muted-foreground"
+          className="text-muted-foreground"
         >
-          <Flag className="mr-1.5 size-3.5" aria-hidden />
+          <Flag className="mr-1.5 size-4" aria-hidden />
           Report listing
         </Button>
       </SheetTrigger>

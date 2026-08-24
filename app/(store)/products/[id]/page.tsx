@@ -122,7 +122,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </p>
           )}
 
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <WishlistToggleButton
               productId={product.$id}
               initialSaved={saved}
