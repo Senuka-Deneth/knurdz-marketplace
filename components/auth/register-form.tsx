@@ -65,7 +65,8 @@ export function RegisterForm({ oauthError }: { oauthError?: string }) {
 
       {accountType === "seller" ? (
         <p className="text-sm text-muted-foreground">
-          Continue with Google, Apple, or Facebook, then tell us about your shop.
+          After you sign in with Google, Apple, Facebook, or email, we will ask
+          for your shop details on the next page.
         </p>
       ) : null}
 
@@ -113,45 +114,6 @@ export function RegisterForm({ oauthError }: { oauthError?: string }) {
           />
         </div>
 
-        {accountType === "seller" ? (
-          <div className="space-y-5 rounded-lg border border-border bg-card px-3 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="shopName">Shop name</Label>
-              <Input
-                id="shopName"
-                name="shopName"
-                type="text"
-                required
-                maxLength={128}
-                autoComplete="organization"
-                placeholder="e.g. Campus Crafts"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="slug">Shop URL slug (optional)</Label>
-              <Input
-                id="slug"
-                name="slug"
-                type="text"
-                maxLength={128}
-                autoComplete="off"
-                placeholder="campus-crafts"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio (optional)</Label>
-              <textarea
-                id="bio"
-                name="bio"
-                rows={3}
-                maxLength={2000}
-                placeholder="What do you sell?"
-                className="w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              />
-            </div>
-          </div>
-        ) : null}
-
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
           <Input
@@ -173,7 +135,7 @@ export function RegisterForm({ oauthError }: { oauthError?: string }) {
           {pending
             ? "Creating account…"
             : accountType === "seller"
-              ? "Apply as seller"
+              ? "Continue to shop details"
               : "Create account"}
         </Button>
 

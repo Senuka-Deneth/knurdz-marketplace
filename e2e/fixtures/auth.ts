@@ -44,15 +44,16 @@ export async function registerSeller(
 ): Promise<void> {
   await page.goto("/register");
   await page.getByTestId("register-account-seller").check();
-  await page.locator("#shopName").waitFor({ state: "visible" });
   await page.locator("#name").fill(params.name);
   await page.locator("#email").fill(params.email);
+  await page.locator("#password").fill(params.password ?? DEMO_PASSWORD);
+  await page.getByTestId("register-submit").click();
+  await page.waitForURL(/\/register\/shop/, { timeout: 30_000 });
   await page.locator("#shopName").fill(params.shopName);
   if (params.slug) {
     await page.locator("#slug").fill(params.slug);
   }
-  await page.locator("#password").fill(params.password ?? DEMO_PASSWORD);
-  await page.getByTestId("register-submit").click();
+  await page.getByTestId("seller-apply-submit").click();
   await page.waitForURL(/\/seller\/pending/, { timeout: 30_000 });
 }
 

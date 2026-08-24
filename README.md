@@ -80,7 +80,7 @@ Login and register offer **Google**, **Apple**, and **Facebook** via Appwrite `c
    - **Google:** Google Cloud Console → OAuth 2.0 Client (Web). Paste client ID + secret into Appwrite.
    - **Facebook:** Meta app → App ID + App Secret; add the Appwrite redirect URI under Valid OAuth Redirect URIs.
    - **Apple:** Sign in with Apple (paid Apple Developer account). Appwrite needs Services ID, Team ID, Key ID, and the `.p8` key.
-4. Seller social signup: choose **Seller** on `/register`, continue with a provider, then complete shop details on `/register/shop` (admin still approves).
+4. Seller signup: choose **Seller** on `/register`, sign in with Google, Apple, Facebook, or email, then complete shop details on `/register/shop` (admin still approves).
 
 Until a provider is enabled in the console, its button redirects back to login/register with an error. Do not put OAuth client secrets in `.env.local`.
 

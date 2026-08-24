@@ -32,7 +32,7 @@ Route guards: [`proxy.ts`](../../proxy.ts) (cookie) + `app/seller/layout.tsx` / 
 
 Server-action rate limits live in [`lib/security/rate-limit.ts`](../../lib/security/rate-limit.ts) (in-process sliding window). Wired on login, register, OAuth start, password recovery, email verify, and uploads via [`lib/appwrite/storage.ts`](../../lib/appwrite/storage.ts) `uploadFile`. **Single-instance only** — multi-instance hosts need a shared store later.
 
-Google / Apple / Facebook: enable providers in Appwrite **Auth → Settings** (secrets never in Next.js). Flow: `createOAuth2Token` → [`/oauth/callback`](../../app/(auth)/oauth/callback/route.ts) → `knurdz_session`. First OAuth login creates `profiles` + `buyer` label. Seller intent continues at `/register/shop`.
+Google / Apple / Facebook: enable providers in Appwrite **Auth → Settings** (secrets never in Next.js). Flow: `createOAuth2Token` → [`/oauth/callback`](../../app/(auth)/oauth/callback/route.ts) → `knurdz_session`. First OAuth login creates `profiles` + `buyer` label. Seller intent (email or social) continues at `/register/shop`.
 
 ## Status / method enums (canonical)
 

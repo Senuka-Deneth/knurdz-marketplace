@@ -17,10 +17,6 @@ import { ROLE_LABELS } from "./roles";
 import { createAdminClient, createSessionClient } from "./server";
 import { clearSessionCookie, setSessionCookie } from "./session-cookie";
 import { getLoggedInUser } from "./session";
-import {
-  createPendingSellerProfileForUser,
-  parseSellerApplicationInput,
-} from "@/lib/services/seller-application";
 import { logError } from "@/lib/observability/log-error";
 import { debugLog9145e1 } from "@/lib/debug-9145e1";
 
@@ -131,18 +127,6 @@ export async function signUpWithEmail(
     return { error: "Phone number is too long." };
   }
 
-  const sellerInput =
-    accountType === "seller"
-      ? parseSellerApplicationInput({
-          shopName: readString(formData, "shopName"),
-          slug: readString(formData, "slug") || undefined,
-          bio: readString(formData, "bio") || undefined,
-        })
-      : null;
-  if (sellerInput && !sellerInput.ok) {
-    return { error: sellerInput.error };
-  }
-
   const ip = await getClientIp();
   const registerLimit = assertRateLimit({
     bucket: "auth.register",
@@ -165,12 +149,10 @@ export async function signUpWithEmail(
     });
     createdUserId = user.$id;
 
-    if (accountType === "buyer") {
-      await users.updateLabels({
-        userId: user.$id,
-        labels: [ROLE_LABELS.buyer],
-      });
-    }
+    await users.updateLabels({
+      userId: user.$id,
+      labels: [ROLE_LABELS.buyer],
+    });
 
     try {
       await createProfileForUser({
@@ -183,19 +165,6 @@ export async function signUpWithEmail(
       await rollbackSignup(user.$id);
       createdUserId = null;
       throw profileError;
-    }
-
-    if (accountType === "seller" && sellerInput?.ok) {
-      const shop = await createPendingSellerProfileForUser(user.$id, {
-        shopName: sellerInput.shopName,
-        slug: sellerInput.slug,
-        bio: sellerInput.bio ?? undefined,
-      });
-      if (!shop.ok) {
-        await rollbackSignup(user.$id);
-        createdUserId = null;
-        return { error: shop.error };
-      }
     }
 
     const session = await account.createEmailPasswordSession({
@@ -219,6 +188,10 @@ export async function signUpWithEmail(
       await rollbackSignup(createdUserId);
     }
     return { error: mapAuthError(error) };
+  }
+
+  if (accountType === "seller") {
+    redirect("/register/shop");
   }
 
   const sessionUser = await getLoggedInUser();

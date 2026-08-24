@@ -22,7 +22,7 @@ export default async function RegisterPage({
       <PageHeader
         eyebrow="Account"
         title="Create account"
-        description="Register as a buyer to shop, or as a seller to apply for a shop. Admin accounts are created by the team."
+        description="Register as a buyer to shop, or as a seller — shop details come on the next page after you sign in. Admin accounts are created by the team."
       />
       <div className="mt-8">
         <RegisterForm oauthError={oauthError} />

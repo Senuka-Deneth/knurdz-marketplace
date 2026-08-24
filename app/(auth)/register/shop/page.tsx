@@ -28,7 +28,7 @@ export default async function RegisterShopPage() {
       <PageHeader
         eyebrow="Seller"
         title="Tell us about your shop"
-        description="Your account is ready. Submit shop details so an admin can review your application."
+        description="Shop name, URL, and bio are submitted for admin review. You can finish this after Google, Apple, Facebook, or email sign-in."
       />
       <SellerApplyForm />
     </div>
