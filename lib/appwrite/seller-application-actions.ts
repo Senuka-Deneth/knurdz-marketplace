@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import {
   submitSellerApplicationCore,
   updateOwnBankDetailsCore,
@@ -49,7 +50,7 @@ export async function submitSellerApplication(
   revalidatePath("/seller/pending");
   revalidatePath("/seller");
   revalidatePath("/admin/sellers");
-  return { success: result.message };
+  redirect("/seller/pending");
 }
 
 export async function updateOwnShopProfile(

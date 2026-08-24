@@ -20,7 +20,7 @@ Appwrite Auth **labels** (not Teams for MVP):
 
 | Label | Meaning | Assigned by |
 |-------|---------|-------------|
-| `buyer` | Shopper | Register as Buyer (`Users.updateLabels`) |
+| `buyer` | Shopper | Register as Buyer, or first Google/Apple/Facebook login (`Users.updateLabels`) |
 | `seller` | Approved seller | Admin approval (not merged with `buyer`) |
 | `admin` | Platform admin | Appwrite console / seed |
 
@@ -30,7 +30,9 @@ Route guards: [`proxy.ts`](../../proxy.ts) (cookie) + `app/seller/layout.tsx` / 
 
 ### Abuse guards (step 1.14)
 
-Server-action rate limits live in [`lib/security/rate-limit.ts`](../../lib/security/rate-limit.ts) (in-process sliding window). Wired on login, register, password recovery, email verify, and uploads via [`lib/appwrite/storage.ts`](../../lib/appwrite/storage.ts) `uploadFile`. **Single-instance only** — multi-instance hosts need a shared store later.
+Server-action rate limits live in [`lib/security/rate-limit.ts`](../../lib/security/rate-limit.ts) (in-process sliding window). Wired on login, register, OAuth start, password recovery, email verify, and uploads via [`lib/appwrite/storage.ts`](../../lib/appwrite/storage.ts) `uploadFile`. **Single-instance only** — multi-instance hosts need a shared store later.
+
+Google / Apple / Facebook: enable providers in Appwrite **Auth → Settings** (secrets never in Next.js). Flow: `createOAuth2Token` → [`/oauth/callback`](../../app/(auth)/oauth/callback/route.ts) → `knurdz_session`. First OAuth login creates `profiles` + `buyer` label. Seller intent continues at `/register/shop`.
 
 ## Status / method enums (canonical)
 
@@ -555,3 +557,4 @@ Uploads are rate-limited in `uploadFile` (see Abuse guards above).
 | 2026-08-22 | Exclusive buyer/seller/admin shells. Register chooses buyer or seller (pending shop). `view_stats` daily aggregates for seller dashboards. |
 | 2026-08-22 | Payment hardening: stock at placement + restore on cancel/refund; COD accept leaves payment pending; bank-slip reject retry vs reject-and-cancel; `rate_limits` table; reviews unique `(orderId,buyerId,productId)`; coupon one-per-buyer. Drift check: `npm run schema:verify`. |
 | 2026-08-22 | `seller_profiles.bankTransferNotes` (optional, 2000). Bank-slip approve/reject is seller-owned (`order.sellerId`); admin bank-slip queue is read-only. `bank_slips.fileId_idx`. |
+| 2026-08-24 | Google / Apple / Facebook OAuth — no new tables. First social login creates `profiles` + `buyer` label. Seller intent continues at `/register/shop`. |

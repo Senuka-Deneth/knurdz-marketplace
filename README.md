@@ -65,8 +65,24 @@ Fill `.env.local` with Appwrite values (see below). Do not commit secrets; only 
    - `NEXT_PUBLIC_APPWRITE_PROJECT_ID=` project id from **Settings**
    - `APPWRITE_API_KEY=` a server API key with **`sessions.write`**, **`users.write`**, and **`databases.write`** (SSR auth + profile create-on-register; never `NEXT_PUBLIC_*`)
    - `NEXT_PUBLIC_APP_URL=http://localhost:3000` for local dev
-4. Under **Add a platform**, add a **Web** app with hostname `localhost` (required for browser SDK CORS and recovery/verify redirect URLs).
-5. Set `NEXT_PUBLIC_APP_URL` to the same origin you open in the browser (e.g. `http://localhost:3000`) so password-reset and email-verify links redirect correctly.
+4. Under **Add a platform**, add a **Web** app with hostname `localhost` (required for browser SDK CORS and recovery/verify redirect URLs). Add the production hostname the same way before enabling OAuth in prod.
+5. Set `NEXT_PUBLIC_APP_URL` to the same origin you open in the browser (e.g. `http://localhost:3000`) so password-reset, email-verify, and OAuth callback URLs redirect correctly.
+
+### Social login (OAuth)
+
+Login and register offer **Google**, **Apple**, and **Facebook** via Appwrite `createOAuth2Token` (SSR session cookie — same `knurdz_session` as email). Provider app credentials stay in **Appwrite Console**, not Next.js env.
+
+1. Open the project → **Auth → Settings** and enable **Google**, **Apple**, and **Facebook**.
+2. Copy the redirect URI Appwrite shows for each provider into that provider’s developer console. It looks like:
+   `{NEXT_PUBLIC_APPWRITE_ENDPOINT}/account/sessions/oauth2/callback/{provider}/{PROJECT_ID}`
+   Example: `https://sgp.cloud.appwrite.io/v1/account/sessions/oauth2/callback/google/<projectId>`
+3. Provider apps:
+   - **Google:** Google Cloud Console → OAuth 2.0 Client (Web). Paste client ID + secret into Appwrite.
+   - **Facebook:** Meta app → App ID + App Secret; add the Appwrite redirect URI under Valid OAuth Redirect URIs.
+   - **Apple:** Sign in with Apple (paid Apple Developer account). Appwrite needs Services ID, Team ID, Key ID, and the `.p8` key.
+4. Seller social signup: choose **Seller** on `/register`, continue with a provider, then complete shop details on `/register/shop` (admin still approves).
+
+Until a provider is enabled in the console, its button redirects back to login/register with an error. Do not put OAuth client secrets in `.env.local`.
 
 Clients live in [`lib/appwrite/`](./lib/appwrite/): browser (`appwrite`) + server session/admin (`node-appwrite`). Session cookie name: `knurdz_session`. TablesDB database id: `marketplace` — full table contract in [`docs/agent/SCHEMA.md`](./docs/agent/SCHEMA.md). Re-apply with `node --env-file=.env.local scripts/setup-mvp-schema.mjs`. Storage buckets (`avatars`, `product-images`, `bank-slips`): `node --env-file=.env.local scripts/setup-storage-buckets.mjs` (API key needs **storage** write).
 
