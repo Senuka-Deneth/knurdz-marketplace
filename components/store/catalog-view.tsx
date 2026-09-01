@@ -1,12 +1,14 @@
+import Link from "next/link";
 import { ProductCatalogFilters } from "@/components/store/product-catalog-filters";
 import { CategoryRail } from "@/components/store/category-rail";
 import { ProductGrid } from "@/components/store/product-grid";
 import { EmptyState } from "@/components/layout/empty-state";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
+import { getSessionUser } from "@/lib/services";
+import { listOwnWishlistItems } from "@/lib/services/wishlist";
 import type { ProductCatalogParams, ProductCoverMap } from "@/lib/services/products";
 import type { Category, Product } from "@/lib/types";
-import Link from "next/link";
 
 type CatalogViewProps = {
   title: string;
@@ -25,7 +27,7 @@ type CatalogViewProps = {
   invalidPriceRange: boolean;
 };
 
-export function CatalogView({
+export async function CatalogView({
   title,
   description,
   eyebrow = "Market",
@@ -41,8 +43,17 @@ export function CatalogView({
   emptyDescription,
   invalidPriceRange,
 }: CatalogViewProps) {
+  const authUser = await getSessionUser();
+  const isLoggedIn = Boolean(authUser);
+  let savedProductIds: Set<string> | undefined;
+
+  if (isLoggedIn) {
+    const items = await listOwnWishlistItems({ limit: 50 });
+    savedProductIds = new Set(items.map((item) => item.productId));
+  }
+
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <main className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <PageHeader eyebrow={eyebrow} title={title} description={description} />
 
       <div className="mt-8 space-y-6">
@@ -76,7 +87,12 @@ export function CatalogView({
         />
       ) : (
         <div className="mt-8">
-          <ProductGrid products={products} covers={covers} />
+          <ProductGrid
+            products={products}
+            covers={covers}
+            isLoggedIn={isLoggedIn}
+            savedProductIds={savedProductIds}
+          />
         </div>
       )}
     </main>

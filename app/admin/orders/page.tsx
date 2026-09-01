@@ -1,6 +1,17 @@
 import Link from "next/link";
 import { AdminOrderOverrideActions } from "@/components/admin/admin-order-override-actions";
+import { DataTableFrame } from "@/components/layout/data-table-frame";
+import { PageHeader } from "@/components/layout/page-header";
+import { StatusBadge } from "@/components/layout/status-badge";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   formatOrderStatus,
   formatPaymentMethod,
@@ -53,11 +64,6 @@ function formatCreatedAt(iso: string): string {
   } catch {
     return iso;
   }
-}
-
-function truncateAddress(address: string, max = 80): string {
-  if (address.length <= max) return address;
-  return `${address.slice(0, max - 1)}…`;
 }
 
 function buildFilterHref(params: Record<string, string | undefined>): string {
@@ -115,15 +121,16 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
     : null;
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <h2 className="mt-3 text-3xl font-bold tracking-tight">All orders</h2>
-      <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-        Platform-wide order oversight. Cancel unpaid orders or refund paid
-        ones — both write canonical statuses and an audit log. Captured
-        PayHere money is returned in the merchant dashboard, not here.
-      </p>
+    <div>
+      <PageHeader
+        size="compact"
+        headingAs="h2"
+        eyebrow="Admin"
+        title="All orders"
+        description="Platform-wide order oversight. Cancel unpaid orders or refund paid ones."
+      />
 
-      <form method="get" className="mt-8 flex flex-wrap items-end gap-3">
+      <form method="get" className="mt-6 flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1 font-mono text-xs text-muted-foreground">
           Order status
           <select
@@ -177,87 +184,86 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
         </Button>
 
         {hasFilters ? (
-          <Link
-            href={clearHref}
-            className="inline-flex items-center rounded-md border border-border px-3 py-2 font-mono text-xs text-muted-foreground hover:bg-muted"
-          >
-            Clear
-          </Link>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={clearHref}>Clear</Link>
+          </Button>
         ) : null}
       </form>
 
       {orders.length === 0 ? (
-        <p className="mt-10 rounded-md border border-border bg-card px-4 py-5 font-mono text-sm text-muted-foreground">
+        <p className="mt-8 rounded-md border border-border bg-card px-4 py-5 font-mono text-sm text-muted-foreground">
           {hasFilters
             ? "No orders match the selected filters."
-            : "No orders yet. When buyers complete checkout, orders will appear here."}
+            : "No orders yet."}
         </p>
       ) : (
-        <ul className="mt-10 space-y-4">
-          {orders.map((order) => {
-            const shopName = sellerById.get(order.sellerId);
-            return (
-              <li
-                key={order.$id}
-                className="rounded-md border border-border bg-card px-4 py-5"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="font-mono text-xs text-muted-foreground">
-                      {order.$id}
-                    </p>
-                    <p className="mt-1 text-lg font-bold tracking-tight">
+        <DataTableFrame className="mt-8">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order</TableHead>
+                <TableHead>Buyer</TableHead>
+                <TableHead>Seller</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {orders.map((order) => {
+                const shopName = sellerById.get(order.sellerId);
+                return (
+                  <TableRow key={order.$id}>
+                    <TableCell className="font-mono text-xs">
+                      {order.$id.slice(0, 10)}…
+                    </TableCell>
+                    <TableCell className="max-w-[120px] truncate font-mono text-xs text-muted-foreground">
+                      {order.buyerId}
+                    </TableCell>
+                    <TableCell className="max-w-[140px] truncate">
+                      {shopName ?? order.sellerId}
+                    </TableCell>
+                    <TableCell className="font-mono tabular-nums">
                       {formatAmount(order.totalAmount, order.currency)}
-                    </p>
-                  </div>
-                  <p className="font-mono text-xs text-muted-foreground">
-                    {formatCreatedAt(order.$createdAt)}
-                  </p>
-                </div>
-
-                <p className="mt-3 font-mono text-xs text-muted-foreground">
-                  Buyer: {order.buyerId}
-                  {" · "}
-                  Seller: {shopName ?? order.sellerId}
-                </p>
-
-                <p className="mt-1 font-mono text-xs text-muted-foreground">
-                  Order: {formatOrderStatus(order.status)}
-                  {" · "}
-                  Method: {formatPaymentMethod(order.paymentMethod)}
-                  {" · "}
-                  Payment:{" "}
-                  {order.paymentStatus
-                    ? formatPaymentStatus(order.paymentStatus)
-                    : "—"}
-                </p>
-
-                <p
-                  className="mt-2 font-mono text-xs text-muted-foreground"
-                  title={order.shippingAddress}
-                >
-                  Ship to: {truncateAddress(order.shippingAddress)}
-                </p>
-
-                <AdminOrderOverrideActions
-                  orderId={order.$id}
-                  orderStatus={order.status}
-                  paymentStatus={order.paymentStatus}
-                />
-              </li>
-            );
-          })}
-        </ul>
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={order.status} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <p className="text-xs">{formatPaymentMethod(order.paymentMethod)}</p>
+                        {order.paymentStatus ? (
+                          <StatusBadge status={order.paymentStatus} />
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {formatCreatedAt(order.$createdAt)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <AdminOrderOverrideActions
+                        orderId={order.$id}
+                        orderStatus={order.status}
+                        paymentStatus={order.paymentStatus}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </DataTableFrame>
       )}
 
       {nextHref ? (
         <div className="mt-8">
-          <Link
-            href={nextHref}
-            className="inline-flex items-center rounded-md border border-border px-4 py-2 font-mono text-sm hover:bg-muted"
-          >
-            Next page →
-          </Link>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={nextHref}>Next page</Link>
+          </Button>
         </div>
       ) : null}
     </div>

@@ -1,9 +1,18 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/layout/empty-state";
+import { DataTableFrame } from "@/components/layout/data-table-frame";
 import { PageHeader } from "@/components/layout/page-header";
+import { StatusBadge } from "@/components/layout/status-badge";
 import { SubmitListingButton } from "@/components/seller/submit-listing-button";
+import { EmptyState } from "@/components/layout/empty-state";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { listCategories } from "@/lib/services/categories";
 import {
   canSubmitListingForReview,
@@ -27,7 +36,9 @@ export default async function SellerListingsPage() {
   return (
     <div>
       <PageHeader
+        size="compact"
         headingAs="h2"
+        eyebrow="Seller"
         title="Listings"
         description="Drafts stay private until you submit for review. Approved listings appear on the storefront."
         actions={
@@ -51,39 +62,54 @@ export default async function SellerListingsPage() {
           }
         />
       ) : (
-        <ul className="mt-10 divide-y divide-border rounded-md border border-border bg-card">
-          {products.map((product) => (
-            <li
-              key={product.$id}
-              className="flex flex-wrap items-center justify-between gap-3 px-4 py-4"
-            >
-              <div className="min-w-0 flex-1">
-                <Link
-                  href={`/seller/listings/${product.$id}`}
-                  className="truncate font-medium hover:underline"
-                >
-                  {product.title}
-                </Link>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {formatPrice(product.price, product.currency, product.isFree)}
-                  {" · "}
-                  {product.stock} in stock
-                  {" · "}
-                  {product.available ? "Available" : "Unavailable"}
-                  {" · "}
-                  {imageCounts.get(product.$id) ?? 0} image
-                  {(imageCounts.get(product.$id) ?? 0) === 1 ? "" : "s"}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="outline">{product.status}</Badge>
-                {canSubmitListingForReview(product.status) ? (
-                  <SubmitListingButton productId={product.$id} />
-                ) : null}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <DataTableFrame className="mt-8">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Listing</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Images</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.map((product) => (
+                <TableRow key={product.$id}>
+                  <TableCell className="max-w-[240px]">
+                    <Link
+                      href={`/seller/listings/${product.$id}`}
+                      className="truncate font-medium hover:text-accent"
+                    >
+                      {product.title}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="font-mono tabular-nums">
+                    {formatPrice(product.price, product.currency, product.isFree)}
+                  </TableCell>
+                  <TableCell className="tabular-nums">{product.stock}</TableCell>
+                  <TableCell className="tabular-nums">
+                    {imageCounts.get(product.$id) ?? 0}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      <StatusBadge status={product.status} />
+                      {!product.available ? (
+                        <StatusBadge status="unavailable" />
+                      ) : null}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {canSubmitListingForReview(product.status) ? (
+                      <SubmitListingButton productId={product.$id} />
+                    ) : null}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTableFrame>
       )}
     </div>
   );

@@ -191,12 +191,14 @@
 }
 
 html {
-  color-scheme: dark;
   overflow-x: clip;
 }
 
-html.light,
-html[data-theme="light"] {
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
   color-scheme: light;
 }
 

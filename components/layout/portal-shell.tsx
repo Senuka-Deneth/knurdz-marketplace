@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Menu } from "lucide-react";
+import { PortalCurrentTitle } from "@/components/layout/portal-current-title";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { signOut } from "@/lib/appwrite/auth";
 import { SkipToContent } from "@/components/layout/skip-to-content";
 import {
@@ -89,7 +91,9 @@ export function PortalShell({
               {title}
             </h1>
           </div>
+          <PortalCurrentTitle nav={nav} fallback={title} />
           <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
             <NotificationBell className="size-10" />
             <Button variant="ghost" size="sm" asChild>
               <Link href="/account">Account</Link>
@@ -101,7 +105,7 @@ export function PortalShell({
           tabIndex={-1}
           className="flex-1 px-4 py-8 outline-none md:px-8"
         >
-          <div className="mx-auto w-full max-w-6xl">{children}</div>
+          <div className="mx-auto w-full max-w-7xl">{children}</div>
         </main>
       </div>
     </div>

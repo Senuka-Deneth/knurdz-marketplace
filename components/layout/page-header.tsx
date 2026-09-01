@@ -4,10 +4,11 @@ import { cn } from "@/lib/utils";
 type PageHeaderProps = {
   eyebrow?: string;
   title: string;
-  description?: string;
+  description?: ReactNode;
   actions?: ReactNode;
   className?: string;
   headingAs?: "h1" | "h2";
+  size?: "default" | "compact";
 };
 
 export function PageHeader({
@@ -17,8 +18,11 @@ export function PageHeader({
   actions,
   className,
   headingAs = "h1",
+  size = "default",
 }: PageHeaderProps) {
   const Heading = headingAs;
+  const compact = size === "compact";
+
   return (
     <header
       className={cn(
@@ -34,14 +38,21 @@ export function PageHeader({
         ) : null}
         <Heading
           className={cn(
-            "text-4xl font-bold tracking-tight sm:text-5xl",
+            compact
+              ? "text-2xl font-bold tracking-tight sm:text-3xl"
+              : "text-4xl font-bold tracking-tight sm:text-5xl",
             eyebrow ? "mt-2" : null,
           )}
         >
           {title}
         </Heading>
         {description ? (
-          <p className="mt-2 text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p
+            className={cn(
+              "mt-2 leading-relaxed text-muted-foreground",
+              compact ? "text-sm sm:text-base" : "text-base sm:text-lg",
+            )}
+          >
             {description}
           </p>
         ) : null}

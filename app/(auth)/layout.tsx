@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SkipToContent } from "@/components/layout/skip-to-content";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -18,9 +19,12 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             className="animate-hero-glow absolute top-[18%] left-[20%] h-72 w-72 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--accent)_16%,transparent)_0%,transparent_70%)]"
           />
           <div className="relative flex h-full flex-col justify-between px-12 py-16">
-            <Link href="/" className="text-sm font-semibold tracking-tight">
-              Knurdz<span className="text-accent">.</span>
-            </Link>
+            <div className="flex items-center justify-between gap-4">
+              <Link href="/" className="text-sm font-semibold tracking-tight">
+                Knurdz<span className="text-accent">.</span>
+              </Link>
+              <ThemeToggle />
+            </div>
             <div>
               <p className="text-xs font-medium tracking-[0.2em] text-muted-foreground uppercase">
                 Marketplace
@@ -36,6 +40,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </div>
         </aside>
         <div className="relative flex min-h-screen items-center justify-center px-6 py-16">
+          <div className="absolute top-6 right-6 lg:hidden">
+            <ThemeToggle />
+          </div>
           <div className="w-full max-w-md">
             <Link
               href="/"
