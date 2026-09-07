@@ -107,6 +107,7 @@ Use after every change that touches code or schema:
 | [x] **1.19** | Platform settings reader    | `getPlatformSetting(s)` + seeded MVP keys                           | Signed-in read; guest → null; unknown key → null       |
 | [x] **1.20** | PayHere Function interfaces | `PAYHERE.md` + types + `requestPayHereCheckout` stub (no secrets)   | Contract frozen; missing Function → typed error        |
 | [x] **1.21** | A11y / responsive baseline  | Skip link, reduced motion, landmarks, touch targets, form alerts    | Skip→#main-content; login/profile errors wired         |
+| [x] **1.29** | Google / Apple / Facebook OAuth | `createOAuth2Token` + `/oauth/callback` httpOnly session; seller intent → `/register/shop` | Buttons on login/register; console providers required |
 
 
 - [x] In-app notifications collection + badge hook/UI (polling OK for MVP; realtime later)
@@ -120,6 +121,7 @@ Use after every change that touches code or schema:
 - [x] Accessibility / responsive baseline pass
 - [x] Role-based post-login redirects (admin → `/admin`, seller → `/seller`, pending seller → `/seller/pending`, buyer → `/market`); exclusive shells; single `/login`
 - [x] Fix cross-member integration issues; keep API contracts consistent — **Phase 6.16**
+- [x] Social auth: Google, Apple, Facebook on login/register (`createOAuth2Token` + httpOnly session; seller OAuth continues at `/register/shop`)
 
 ### Payment setup (Member 1 — was formerly Members 2 + 4)
 

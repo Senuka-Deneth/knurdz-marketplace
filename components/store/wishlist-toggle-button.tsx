@@ -25,7 +25,7 @@ export function WishlistToggleButton({
 
   if (!isLoggedIn) {
     return (
-      <Button variant="secondary" asChild className="mt-4">
+      <Button variant="secondary" asChild>
         <Link href={loginHref}>
           <Heart className="mr-1.5 size-4" aria-hidden />
           Sign in to save
@@ -54,7 +54,6 @@ export function WishlistToggleButton({
     <Button
       type="button"
       variant="secondary"
-      className="mt-4"
       disabled={pending}
       onClick={handleToggle}
       aria-pressed={saved}
