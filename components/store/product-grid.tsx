@@ -7,9 +7,17 @@ type ProductGridProps = {
   products: Product[];
   covers?: ProductCoverMap;
   className?: string;
+  isLoggedIn?: boolean;
+  savedProductIds?: ReadonlySet<string>;
 };
 
-export function ProductGrid({ products, covers, className }: ProductGridProps) {
+export function ProductGrid({
+  products,
+  covers,
+  className,
+  isLoggedIn = false,
+  savedProductIds,
+}: ProductGridProps) {
   if (products.length === 0) return null;
 
   return (
@@ -24,6 +32,8 @@ export function ProductGrid({ products, covers, className }: ProductGridProps) {
           key={product.$id}
           product={product}
           cover={covers?.[product.$id]}
+          isLoggedIn={isLoggedIn}
+          saved={savedProductIds?.has(product.$id) ?? false}
         />
       ))}
     </ul>

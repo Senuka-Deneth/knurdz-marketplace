@@ -66,10 +66,16 @@ function revalidateListingPaths(productId: string): void {
   revalidatePath("/shop", "layout");
 }
 
+function readCreateIntent(formData: FormData): "draft" | "list" {
+  const raw = formData.get("intent");
+  return raw === "list" ? "list" : "draft";
+}
+
 export async function createDraftListing(
   _prev: CreateListingActionState,
   formData: FormData,
 ): Promise<CreateListingActionState> {
+  const intent = readCreateIntent(formData);
   const result = await createDraftProductCore(
     readListingFields(formData),
     readImageFiles(formData),
@@ -77,6 +83,16 @@ export async function createDraftListing(
 
   if (!result.ok) {
     return { error: result.error };
+  }
+
+  if (intent === "list") {
+    const submitted = await submitListingForReviewCore(result.productId);
+    if (!submitted.ok) {
+      return {
+        error: `Draft saved, but it could not be submitted for review: ${submitted.error} Open your listings to try again.`,
+      };
+    }
+    revalidatePath("/admin/listings");
   }
 
   revalidatePath("/seller/listings");

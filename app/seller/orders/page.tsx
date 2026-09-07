@@ -1,6 +1,19 @@
 import Link from "next/link";
-import { SellerOrderListRow } from "@/components/seller/seller-order-list-row";
+import { DataTableFrame } from "@/components/layout/data-table-frame";
+import { PageHeader } from "@/components/layout/page-header";
+import { StatusBadge } from "@/components/layout/status-badge";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  formatPaymentMethod,
+} from "@/lib/order-display";
 import {
   listSellerOrders,
   SELLER_PENDING_STATUSES,
@@ -11,6 +24,17 @@ type SellerOrdersPageProps = {
 };
 
 const INBOX_PAGE_SIZE = 50;
+
+function formatAmount(amount: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+    }).format(amount);
+  } catch {
+    return `${currency} ${amount.toFixed(2)}`;
+  }
+}
 
 export default async function SellerOrdersPage({
   searchParams,
@@ -37,11 +61,14 @@ export default async function SellerOrdersPage({
     : null;
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <h2 className="mt-3 text-3xl font-bold tracking-tight">Orders</h2>
-      <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-        Orders for your shop. Open an order to update fulfillment status.
-      </p>
+    <div>
+      <PageHeader
+        size="compact"
+        headingAs="h2"
+        eyebrow="Seller"
+        title="Orders"
+        description="Orders for your shop. Open an order to update fulfillment status."
+      />
 
       <div className="mt-6 flex flex-wrap gap-2">
         <Button
@@ -61,35 +88,57 @@ export default async function SellerOrdersPage({
       </div>
 
       {orders.length === 0 ? (
-        <p className="mt-10 text-sm text-muted-foreground">
+        <p className="mt-8 text-sm text-muted-foreground">
           {pendingOnly
             ? "No orders need fulfillment right now."
             : "No orders yet."}
         </p>
       ) : (
-        <ul className="mt-10" aria-label="Seller orders">
-          {orders.map((order) => (
-            <SellerOrderListRow key={order.$id} order={order} />
-          ))}
-        </ul>
+        <DataTableFrame className="mt-8">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Method</TableHead>
+                <TableHead className="text-right">View</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {orders.map((order) => (
+                <TableRow key={order.$id}>
+                  <TableCell className="font-mono text-xs">
+                    {order.$id.slice(0, 10)}…
+                  </TableCell>
+                  <TableCell className="font-mono tabular-nums">
+                    {formatAmount(order.totalAmount, order.currency)}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={order.status} />
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    {formatPaymentMethod(order.paymentMethod)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href={`/seller/orders/${order.$id}`}>Open</Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTableFrame>
       )}
 
       {nextHref ? (
         <div className="mt-8">
-          <Link
-            href={nextHref}
-            className="inline-flex rounded-md border border-border px-4 py-2 font-mono text-sm hover:bg-muted"
-          >
-            Load more
-          </Link>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={nextHref}>Load more</Link>
+          </Button>
         </div>
       ) : null}
-
-      <p className="mt-12">
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/seller">Back to dashboard</Link>
-        </Button>
-      </p>
     </div>
   );
 }

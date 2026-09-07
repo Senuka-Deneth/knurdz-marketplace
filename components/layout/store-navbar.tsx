@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Heart, Menu, Search, ShoppingBag } from "lucide-react";
 import type { SessionUserView } from "@/lib/appwrite/session-user";
 import { AccountMenu } from "@/components/layout/account-menu";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,13 +31,13 @@ function NavLinks({
     <nav aria-label="Store" className={className}>
       <Link
         href="/market"
-        className="text-sm text-muted-foreground transition hover:text-foreground"
+        className="text-base text-muted-foreground transition hover:text-accent"
       >
         Market
       </Link>
       <Link
         href="/categories"
-        className="text-sm text-muted-foreground transition hover:text-foreground"
+        className="text-base text-muted-foreground transition hover:text-accent"
       >
         Categories
       </Link>
@@ -73,8 +74,8 @@ export function StoreNavbar({
 }: StoreNavbarProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6">
-        <Link href="/" className="shrink-0 text-sm font-semibold tracking-tight">
+      <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:px-6">
+        <Link href="/" className="shrink-0 text-base font-semibold tracking-tight">
           Knurdz
           <span className="text-accent">.</span>
         </Link>
@@ -84,6 +85,7 @@ export function StoreNavbar({
         <SearchForm className="hidden min-w-0 flex-1 lg:flex" />
 
         <div className="ml-auto hidden items-center gap-1.5 md:flex">
+          <ThemeToggle />
           {user ? (
             <>
               <Button variant="ghost" size="icon" className="relative" asChild>
@@ -127,6 +129,7 @@ export function StoreNavbar({
         </div>
 
         <div className="ml-auto flex items-center gap-1.5 md:hidden">
+          <ThemeToggle />
           {user ? <NotificationBell className="size-10" /> : null}
           <Sheet>
             <SheetTrigger asChild>

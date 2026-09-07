@@ -3,6 +3,18 @@ import {
   ListingDescription,
   ListingRowActions,
 } from "@/components/admin/listing-moderation-actions";
+import { DataTableFrame } from "@/components/layout/data-table-frame";
+import { PageHeader } from "@/components/layout/page-header";
+import { StatusBadge } from "@/components/layout/status-badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   getPublicSellerByUserId,
   listCategories,
@@ -66,16 +78,16 @@ export default async function AdminListingsPage({ searchParams }: PageProps) {
   const activeHref = "/admin/listings?view=active";
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <h2 className="mt-3 text-3xl font-bold tracking-tight">
-        Listing moderation
-      </h2>
-      <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-        Review pending listings before they go live, or remove active listings
-        from the storefront.
-      </p>
+    <div>
+      <PageHeader
+        size="compact"
+        headingAs="h2"
+        eyebrow="Admin"
+        title="Listing moderation"
+        description="Review pending listings before they go live, or remove active listings from the storefront."
+      />
 
-      <nav className="mt-8 flex gap-2 font-mono text-sm">
+      <nav className="mt-6 flex gap-2 font-mono text-sm">
         <Link
           href={pendingHref}
           className={
@@ -99,74 +111,79 @@ export default async function AdminListingsPage({ searchParams }: PageProps) {
       </nav>
 
       {listings.length === 0 ? (
-        <p className="mt-10 rounded-md border border-border bg-card px-4 py-5 font-mono text-sm text-muted-foreground">
+        <p className="mt-8 rounded-md border border-border bg-card px-4 py-5 font-mono text-sm text-muted-foreground">
           {view === "pending"
-            ? "No listings awaiting review. When sellers submit products for approval, they will appear here."
+            ? "No listings awaiting review."
             : "No active listings to manage."}
         </p>
       ) : (
-        <ul className="mt-10 space-y-4">
-          {listings.map((product) => {
-            const shopName = sellerById.get(product.sellerId);
-            const categoryName =
-              categoryById.get(product.categoryId) ?? product.categoryId;
+        <DataTableFrame className="mt-8">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Listing</TableHead>
+                <TableHead>Seller</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {listings.map((product) => {
+                const shopName = sellerById.get(product.sellerId);
+                const categoryName =
+                  categoryById.get(product.categoryId) ?? product.categoryId;
 
-            return (
-              <li
-                key={product.$id}
-                className="rounded-md border border-border bg-card px-4 py-5"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-lg font-bold tracking-tight">
-                      {product.title}
-                    </p>
-                    <p className="mt-1 font-mono text-xs text-muted-foreground">
-                      Seller: {shopName ?? product.sellerId}
-                    </p>
-                  </div>
-                  <p className="font-mono text-sm font-bold">
-                    {formatPrice(
-                      product.price,
-                      product.currency,
-                      product.isFree,
-                    )}
-                  </p>
-                </div>
-
-                <p className="mt-2 font-mono text-xs text-muted-foreground">
-                  Category: {categoryName}
-                  {" · "}
-                  {product.available ? "Available" : "Unavailable"}
-                  {" · "}
-                  Stock: {product.stock}
-                  {product.featured ? " · Featured" : ""}
-                </p>
-
-                <ListingDescription description={product.description} />
-
-                <div className="mt-4">
-                  <ListingRowActions
-                    productId={product.$id}
-                    title={product.title}
-                    view={view}
-                    featured={product.featured}
-                  />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                return (
+                  <TableRow key={product.$id}>
+                    <TableCell className="max-w-[220px]">
+                      <p className="truncate font-medium">{product.title}</p>
+                      <ListingDescription description={product.description} />
+                    </TableCell>
+                    <TableCell className="max-w-[160px] truncate font-mono text-xs text-muted-foreground">
+                      {shopName ?? product.sellerId}
+                    </TableCell>
+                    <TableCell>{categoryName}</TableCell>
+                    <TableCell className="font-mono tabular-nums">
+                      {formatPrice(
+                        product.price,
+                        product.currency,
+                        product.isFree,
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        <StatusBadge status={product.status} />
+                        {!product.available ? (
+                          <StatusBadge status="unavailable" />
+                        ) : null}
+                        {product.featured ? (
+                          <StatusBadge status="active" />
+                        ) : null}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <ListingRowActions
+                        productId={product.$id}
+                        title={product.title}
+                        view={view}
+                        featured={product.featured}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </DataTableFrame>
       )}
 
       {nextHref ? (
         <div className="mt-8">
-          <Link
-            href={nextHref}
-            className="inline-flex rounded-md border border-border px-4 py-2 font-mono text-sm hover:bg-muted"
-          >
-            Load more
-          </Link>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={nextHref}>Load more</Link>
+          </Button>
         </div>
       ) : null}
     </div>
