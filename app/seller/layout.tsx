@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { PendingSellerShell } from "@/components/layout/pending-seller-shell";
 import { PortalShell } from "@/components/layout/portal-shell";
 import { ROLE_LABELS, requireUser, userHasLabel } from "@/lib/appwrite/roles";
-import { debugLog9145e1 } from "@/lib/debug-9145e1";
 import {
   blockedSellerPortalDestination,
   getOwnSellerProfile,
@@ -48,19 +47,6 @@ export default async function SellerLayout({
   if (isPendingPage) {
     const profile = await getOwnSellerProfile();
     if (!profile) {
-      // #region agent log
-      debugLog9145e1({
-        hypothesisId: "B",
-        runId: "post-fix",
-        location: "app/seller/layout.tsx:pending-no-profile",
-        message: "pending page missing seller profile → /market",
-        data: {
-          pathname,
-          hasSellerLabel,
-          labels: Array.isArray(user.labels) ? user.labels : null,
-        },
-      });
-      // #endregion
       redirect("/market");
     }
     if (profile.status === "approved") {

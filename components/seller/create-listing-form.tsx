@@ -23,6 +23,7 @@ export function CreateListingForm({
   freeListingsEnabled = true,
 }: CreateListingFormProps) {
   const [isFree, setIsFree] = useState(false);
+  const [intent, setIntent] = useState<"draft" | "list">("draft");
   const [state, formAction, pending] = useActionState(
     createDraftListing,
     initialState,
@@ -166,8 +167,25 @@ export function CreateListingForm({
       </div>
 
       <div className="flex flex-wrap gap-3 pt-2">
-        <Button type="submit" disabled={pending || categories.length === 0} data-testid="listing-save-draft">
-          {pending ? "Saving draft…" : "Save draft"}
+        <Button
+          type="submit"
+          name="intent"
+          value="draft"
+          disabled={pending || categories.length === 0}
+          data-testid="listing-save-draft"
+          onClick={() => setIntent("draft")}
+        >
+          {pending && intent === "draft" ? "Saving draft…" : "Save draft"}
+        </Button>
+        <Button
+          type="submit"
+          name="intent"
+          value="list"
+          disabled={pending || categories.length === 0}
+          data-testid="listing-submit-list"
+          onClick={() => setIntent("list")}
+        >
+          {pending && intent === "list" ? "Submitting…" : "List"}
         </Button>
         <Button variant="outline" type="button" disabled={pending} asChild>
           <Link href="/seller/listings">Cancel</Link>

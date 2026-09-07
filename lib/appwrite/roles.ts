@@ -1,6 +1,5 @@
 import type { Models } from "node-appwrite";
 import { redirect } from "next/navigation";
-import { debugLog9145e1 } from "@/lib/debug-9145e1";
 import type { SellerStatus } from "@/lib/types";
 import { getLoggedInUser } from "./session";
 
@@ -91,36 +90,14 @@ export function homePathForUser(
   sellerStatus?: SellerStatus | null,
 ): string {
   let result = "/market";
-  let branch: "admin" | "seller" | "pending" | "buyer" = "buyer";
   if (userHasLabel(user, "admin")) {
     result = "/admin";
-    branch = "admin";
   } else if (userHasLabel(user, "seller")) {
     result = "/seller";
-    branch = "seller";
   } else if (sellerStatus === "pending" || sellerStatus === "rejected") {
     result = "/seller/pending";
-    branch = "pending";
   }
 
-  // #region agent log
-  debugLog9145e1({
-    hypothesisId: branch === "pending" ? "C" : "B",
-    runId: "post-fix",
-    location: "lib/appwrite/roles.ts:homePathForUser",
-    message: "homePathForUser resolved",
-    data: {
-      labels: Array.isArray(user.labels) ? user.labels : null,
-      labelsType: typeof user.labels,
-      sellerStatus: sellerStatus ?? null,
-      hasBuyer: userHasLabel(user, "buyer"),
-      hasSeller: userHasLabel(user, "seller"),
-      hasAdmin: userHasLabel(user, "admin"),
-      branch,
-      result,
-    },
-  });
-  // #endregion
   return result;
 }
 

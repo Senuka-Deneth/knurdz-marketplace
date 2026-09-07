@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ProductCover } from "@/lib/services/products";
 import type { Product } from "@/lib/types";
+import { ProductWishlistButton } from "@/components/store/product-wishlist-button";
 import {
   coverPreviewUrl,
   formatProductPrice,
@@ -10,9 +11,16 @@ import {
 type ProductCardProps = {
   product: Product;
   cover?: ProductCover;
+  isLoggedIn?: boolean;
+  saved?: boolean;
 };
 
-export function ProductCard({ product, cover }: ProductCardProps) {
+export function ProductCard({
+  product,
+  cover,
+  isLoggedIn = false,
+  saved = false,
+}: ProductCardProps) {
   const price = formatProductPrice(product);
 
   return (
@@ -21,7 +29,13 @@ export function ProductCard({ product, cover }: ProductCardProps) {
         href={`/products/${product.$id}`}
         className={productCardClassName()}
       >
-        <div className="relative aspect-[4/5] overflow-hidden bg-muted/40">
+        {isLoggedIn ? (
+          <ProductWishlistButton
+            productId={product.$id}
+            initialSaved={saved}
+          />
+        ) : null}
+        <div className="relative aspect-square overflow-hidden bg-muted/40">
           {cover ? (
             // eslint-disable-next-line @next/next/no-img-element -- Appwrite Storage preview URL
             <img
@@ -48,11 +62,11 @@ export function ProductCard({ product, cover }: ProductCardProps) {
             </span>
           ) : null}
         </div>
-        <div className="flex items-start justify-between gap-3 px-3 py-3">
-          <p className="min-w-0 truncate text-sm font-medium tracking-tight">
+        <div className="space-y-1 px-3 py-3">
+          <p className="truncate text-sm font-medium tracking-tight">
             {product.title}
           </p>
-          <p className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+          <p className="font-mono text-base font-semibold tabular-nums text-foreground">
             {price}
           </p>
         </div>

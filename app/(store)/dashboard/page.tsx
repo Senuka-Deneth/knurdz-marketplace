@@ -83,24 +83,22 @@ export default async function DashboardPage() {
   const recentOrders = orders.slice(0, RECENT_ORDERS_LIMIT);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
+    <main className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6">
       <PageHeader
+        size="compact"
         eyebrow="Account"
         title="Your dashboard"
         description="Orders, saved products, and what you viewed on this device."
       />
 
-      <section className="mt-12" aria-labelledby="order-summary-heading">
+      <section className="mt-10" aria-labelledby="order-summary-heading">
         <h2
           id="order-summary-heading"
-          className="text-lg font-semibold tracking-tight"
+          className="text-base font-semibold tracking-tight"
         >
           Order summary
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Counts from your most recent orders.
-        </p>
-        <dl className="mt-6 grid grid-cols-3 gap-3">
+        <dl className="mt-4 grid grid-cols-3 gap-3">
           <Card>
             <CardContent>
               <dt className="text-sm text-muted-foreground">Pending</dt>
@@ -128,28 +126,26 @@ export default async function DashboardPage() {
         </dl>
       </section>
 
-      <section className="mt-12" aria-labelledby="recent-orders-heading">
+      <section className="mt-10" aria-labelledby="recent-orders-heading">
         <h2
           id="recent-orders-heading"
-          className="text-lg font-semibold tracking-tight"
+          className="text-base font-semibold tracking-tight"
         >
           Recent orders
         </h2>
         {recentOrders.length === 0 ? (
-          <>
-            <EmptyState
-              className="mt-4"
-              title="No orders yet"
-              action={
-                <Button asChild>
-                  <Link href="/market">Browse listings</Link>
-                </Button>
-              }
-            />
-          </>
+          <EmptyState
+            className="mt-4"
+            title="No orders yet"
+            action={
+              <Button asChild>
+                <Link href="/market">Browse listings</Link>
+              </Button>
+            }
+          />
         ) : (
           <>
-            <ul className="mt-6" aria-label="Recent orders">
+            <ul className="mt-4" aria-label="Recent orders">
               {recentOrders.map((order) => (
                 <OrderListRow key={order.$id} order={order} />
               ))}
@@ -163,10 +159,10 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      <section className="mt-12" aria-labelledby="wishlist-preview-heading">
+      <section className="mt-10" aria-labelledby="wishlist-preview-heading">
         <h2
           id="wishlist-preview-heading"
-          className="text-lg font-semibold tracking-tight"
+          className="text-base font-semibold tracking-tight"
         >
           Wishlist
           {wishlistView.itemCount > 0 ? (
@@ -176,55 +172,57 @@ export default async function DashboardPage() {
           ) : null}
         </h2>
         {wishlistView.lines.length === 0 ? (
-          <>
-            <EmptyState
-              className="mt-4"
-              title="Nothing saved yet"
-              description="Browse listings and tap Save on a product page."
-              action={
-                <Button asChild>
-                  <Link href="/market">Browse listings</Link>
-                </Button>
-              }
-            />
-          </>
+          <EmptyState
+            className="mt-4"
+            title="Nothing saved yet"
+            description="Browse listings and tap Save on a product page."
+            action={
+              <Button asChild>
+                <Link href="/market">Browse listings</Link>
+              </Button>
+            }
+          />
         ) : (
           <>
-            <ul className="mt-6" aria-label="Saved products preview">
+            <ul
+              className="mt-4 grid gap-3 sm:grid-cols-2"
+              aria-label="Saved products preview"
+            >
               {wishlistView.lines.map((line) => {
                 const product = line.product;
                 const title = product?.title ?? "Unknown product";
                 const priceLabel = product
                   ? product.isFree
-                    ? "free"
+                    ? "Free"
                     : `${product.currency} ${product.price.toFixed(2)}`
                   : null;
                 const note = wishlistIssueLabel(line.issue);
                 const href = product ? `/products/${product.$id}` : undefined;
 
                 return (
-                  <li
-                    key={line.item.$id}
-                    className="border-b border-border py-4 last:border-b-0"
-                  >
-                    {href ? (
-                      <Link
-                        href={href}
-                        className="block font-medium tracking-tight hover:text-accent"
-                      >
-                        {title}
-                      </Link>
-                    ) : (
-                      <span className="font-medium tracking-tight">{title}</span>
-                    )}
-                    {priceLabel ? (
-                      <p className="mt-1 font-mono text-sm text-muted-foreground">
-                        {priceLabel}
-                      </p>
-                    ) : null}
-                    {note ? (
-                      <p className="mt-1 text-xs text-muted-foreground">{note}</p>
-                    ) : null}
+                  <li key={line.item.$id}>
+                    <Card className="h-full transition-colors hover:border-foreground/20 hover:bg-card-hover">
+                      <CardContent>
+                        {href ? (
+                          <Link
+                            href={href}
+                            className="block font-medium tracking-tight hover:text-accent"
+                          >
+                            {title}
+                          </Link>
+                        ) : (
+                          <span className="font-medium tracking-tight">{title}</span>
+                        )}
+                        {priceLabel ? (
+                          <p className="mt-2 font-mono text-sm font-semibold tabular-nums">
+                            {priceLabel}
+                          </p>
+                        ) : null}
+                        {note ? (
+                          <p className="mt-1 text-xs text-muted-foreground">{note}</p>
+                        ) : null}
+                      </CardContent>
+                    </Card>
                   </li>
                 );
               })}
